@@ -2,6 +2,7 @@ import React from 'react'
 import Nav from './Nav'
 import Tiles from './Tiles'
 import PeaceZone from './PeaceZone'
+import ContactUs from './Contactus'
 
 const Hero = () => {
     return (
@@ -22,6 +23,7 @@ const Hero = () => {
             </div>
             <PeaceZone />
             <Tiles />
+            <ContactUs />
         </>
     )
 }

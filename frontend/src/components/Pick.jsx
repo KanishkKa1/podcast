@@ -11,7 +11,7 @@ const Pick = () => {
                 <section>
                     <Link to='/speaker' className='item'><span>Speaker</span></Link>
                     <Link to='/listener' className='item'><span>Listener</span></Link>
-                       
+
                 </section>
             </div>
         </>

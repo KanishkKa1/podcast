@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'
 
 const Nav = () => {
 
@@ -11,7 +12,7 @@ const Nav = () => {
                 <div>
                     <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Home</span>
                     <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Connect</span>
-                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Login</span>
+                    <Link to='/login'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Login</span></Link>
                     <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Contact Us</span>
                 </div>
             </div>
