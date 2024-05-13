@@ -1,11 +1,13 @@
-import React from 'react'
+import React from "react";
+import Audio from "./Audio";
 
 const Speaker = () => {
-    return (
-        <div>
-            hello speaker
-        </div>
-    )
-}
+  return (
+    <div>
+      hello speaker
+      <Audio />
+    </div>
+  );
+};
 
-export default Speaker
+export default Speaker;
