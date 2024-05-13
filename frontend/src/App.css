@@ -43,11 +43,11 @@ section {
 
 
 .item:first-of-type {
-    background-image: url(../public/speaker.jpg);
+    background-image: url(/speaker.jpg);
 }
 
 .item:nth-of-type(2) {
-    background-image: url(../public/listener.jpg);
+    background-image: url(/listener.jpg);
 }
 
 .item > span {

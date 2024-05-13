@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Pick = () => {
     return (
@@ -8,12 +9,12 @@ const Pick = () => {
             </div>
             <div className='flex justify-center items-center'>
                 <section>
-                    <div className='item'><span>Speaker</span></div>
-                    <div className='item'><span>Listener</span></div>
+                    <Link to='/speaker' className='item'><span>Speaker</span></Link>
+                    <Link to='/listener' className='item'><span>Listener</span></Link>
                 </section>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default Pick
+export default Pick;

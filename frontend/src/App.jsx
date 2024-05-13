@@ -1,18 +1,19 @@
-import './App.css'
-import Pick from './components/Pick'
+import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Pick from './components/Pick';
+import Listener from './components/Listener';
+import Speaker from './components/Speaker';
 
 function App() {
-
   return (
-    <>
-      <div className='m-5 p-10 bg-black text-white'>
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-        Nemo cupiditate saepe debitis, magni iure illum exercitationem tempore cum iste.
-        Veniam tempora nihil eum aut, distinctio sunt in reprehenderit earum facere.
-      </div>
-      <Pick />
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/listener" element={<Listener />} />
+        <Route path="/speaker" element={<Speaker />} />
+        <Route path="/pick" element={<Pick />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
