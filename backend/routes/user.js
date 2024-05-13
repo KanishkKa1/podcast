@@ -6,6 +6,7 @@ const { bucket } = require("../db");
 const { JWT_SECRET } = require("../config");
 const { authMiddleware } = require("../middleware");
 const { v4: uuidv4 } = require("uuid");
+const bcryptjs = require("bcryptjs");
 
 const baseUsernames = ["rain", "water", "rainbow"];
 
@@ -44,17 +45,19 @@ router.post("/signup", async (req, res) => {
 
   const userId = uuidv4();
   const userFileName = `users/${userId}.json`;
+  const salt = await bcryptjs.genSalt(10);
+  const hashedPassword = await bcryptjs.hash(data.password, salt);
   const userMetadata = {
     username: username,
     email: data.email,
-    password: data.password,
+    password: hashedPassword,
     firstName: data.firstName,
     lastName: data.lastName,
   };
   const userFile = bucket.file(userFileName);
   await userFile.save(JSON.stringify(userMetadata));
 
-  const token = jwt.sign({ userId }, JWT_SECRET);
+  const token = "Bearer " + jwt.sign({ userId }, JWT_SECRET);
 
   res.json({
     message: "User created successfully",
