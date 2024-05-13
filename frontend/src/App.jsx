@@ -1,4 +1,5 @@
 import './App.css'
+import Pick from './components/Pick'
 
 function App() {
 
@@ -9,6 +10,7 @@ function App() {
         Nemo cupiditate saepe debitis, magni iure illum exercitationem tempore cum iste.
         Veniam tempora nihil eum aut, distinctio sunt in reprehenderit earum facere.
       </div>
+      <Pick />
     </>
   )
 }
