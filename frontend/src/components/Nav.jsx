@@ -11,9 +11,11 @@ const Nav = () => {
                 </div>
                 <div>
                     <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Home</span>
+                    <Link to='/pick'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Podcast</span></Link>
                     <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Connect</span>
-                    <Link to='/login'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Login</span></Link>
                     <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Contact Us</span>
+                    <Link to='/login'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Login</span></Link>
+
                 </div>
             </div>
         </div>
