@@ -2,20 +2,9 @@ const express = require("express");
 const router = express.Router();
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../config");
+const { JWT_SECRET, signinBody, signupBody } = require("../config");
 const bcryptjs = require("bcryptjs");
 const db = require("../prisma/index.js");
-
-const signupBody = zod.object({
-  username: zod.string(),
-  email: zod.string().email(),
-  password: zod.string(),
-});
-
-const signinBody = zod.object({
-  email: zod.string().email(),
-  password: zod.string(),
-});
 
 // Signup
 router.post("/signup", async (req, res) => {
