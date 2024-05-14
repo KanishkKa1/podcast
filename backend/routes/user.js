@@ -8,12 +8,8 @@ const { authMiddleware } = require("../middleware");
 const { v4: uuidv4 } = require("uuid");
 const bcryptjs = require("bcryptjs");
 
-const baseUsernames = ["rain", "water", "rainbow"];
-
 const signupBody = zod.object({
   email: zod.string().email(),
-  firstName: zod.string(),
-  lastName: zod.string(),
   password: zod.string(),
 });
 
@@ -24,8 +20,6 @@ const signinBody = zod.object({
 
 const updateBody = zod.object({
   password: zod.string().optional(),
-  firstName: zod.string().optional(),
-  lastName: zod.string().optional(),
 });
 
 // Signup
@@ -37,23 +31,15 @@ router.post("/signup", async (req, res) => {
     });
   }
 
-  const baseUsername =
-    baseUsernames[Math.floor(Math.random() * baseUsernames.length)];
-
-  const randomNumber = Math.floor(Math.random() * 1000);
-  const username = `${baseUsername}${randomNumber}`;
-
   const userId = uuidv4();
   const userFileName = `users/${userId}.json`;
   const salt = await bcryptjs.genSalt(10);
   const hashedPassword = await bcryptjs.hash(data.password, salt);
   const userMetadata = {
-    username: username,
     email: data.email,
     password: hashedPassword,
-    firstName: data.firstName,
-    lastName: data.lastName,
   };
+
   const userFile = bucket.file(userFileName);
   await userFile.save(JSON.stringify(userMetadata));
 
@@ -78,21 +64,55 @@ router.post("/signin", async (req, res) => {
   const password = data.password;
 
   try {
-    const userFiles = await bucket.getFiles({
+    const [userFiles] = await bucket.getFiles({
       prefix: `users/`,
     });
 
-    for (const userFile of userFiles[0]) {
-      const [userMetadata] = await userFile.get();
-      const userData = JSON.parse(userMetadata.toString());
+    let found = false;
+    let token = "";
 
-      if (userData.email === email && userData.password === password) {
-        const token = jwt.sign({ userId: userData.userId }, JWT_SECRET);
-        return res.json({ token });
+    for (const userFile of userFiles) {
+      let buffer = "";
+      console.log(userFile.file);
+
+      const data = await userFile.download();
+      console.log(data);
+
+      // userFile
+      //   .createReadStream()
+      //   .on("data", function (data) {
+      //     buffer += data;
+      //   })
+      //   .on("end", async function () {
+      //     const userData = JSON.parse(buffer);
+      //     console.log(password);
+      //     const passwordMatch = await bcryptjs.compare(
+      //       password,
+      //       userData.password
+      //     );
+
+      //     if (userData.email === email && passwordMatch) {
+      //       console.log(userData, " khajajadfasdfsd");
+      //       found = true;
+      //       token =
+      //         "Bearer " + jwt.sign({ userId: userFile.email }, JWT_SECRET);
+      //       return;
+      //     }
+      //   });
+
+      console.log("going again for the new file, ", found);
+      if (found) {
+        console.log("found it");
+        break;
       }
     }
 
-    res.json({ error: "Invalid email or password" });
+    // Send response for invalid email or password only if no valid user is found
+    if (found) {
+      res.json({ token });
+    } else {
+      res.json({ error: "Invalid email or password" });
+    }
   } catch (error) {
     console.error("Error during user signin:", error);
     res.json({ error: "Error during signin" });
