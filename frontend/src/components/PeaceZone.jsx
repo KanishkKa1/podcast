@@ -1,8 +1,19 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
+import Pick from './Pick'
 
 const PeaceZone = () => {
     return (
         <div className='flex flex-col justify-center items-center'>
+
+            {/* <div>
+
+                <Link to='/pick'><button className='mt-10 text-2xl py-2 px-4 bg-black hover:bg-yellow-300 hover:font-bold transition-all text-white rounded-lg'>Share your story now!</button></Link>
+
+            </div> */}
+
+            <Pick />
+
             <div className='flex justify-center items-center my-10'>
                 <h1 className='text-4xl font-bold'>Welcome To Peace Zone</h1>
             </div>
