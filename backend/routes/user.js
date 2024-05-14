@@ -2,13 +2,12 @@ const express = require("express");
 const router = express.Router();
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
-const { bucket } = require("../db");
 const { JWT_SECRET } = require("../config");
-const { authMiddleware } = require("../middleware");
-const { v4: uuidv4 } = require("uuid");
 const bcryptjs = require("bcryptjs");
+const db = require("../prisma/index.js");
 
 const signupBody = zod.object({
+  username: zod.string(),
   email: zod.string().email(),
   password: zod.string(),
 });
@@ -18,131 +17,104 @@ const signinBody = zod.object({
   password: zod.string(),
 });
 
-const updateBody = zod.object({
-  password: zod.string().optional(),
-});
-
 // Signup
 router.post("/signup", async (req, res) => {
-  const { success, data } = signupBody.safeParse(req.body);
-  if (!success) {
-    return res.json({
-      error: "Incorrect inputs",
+  try {
+    const { success, data } = signupBody.safeParse(req.body);
+
+    if (!success) {
+      return res.status(401).json({
+        error: "Incorrect inputs",
+      });
+    }
+
+    const userExists = await db.user.findUnique({
+      where: {
+        email: data.email,
+        username: data.username,
+      },
     });
+
+    if (userExists) {
+      return res.status(401).json({
+        error: "Username and email should be unique",
+      });
+    }
+
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(data.password, salt);
+    const user = await db.user.create({
+      data: {
+        username: data.username,
+        email: data.email,
+        password: hashedPassword,
+      },
+    });
+
+    const token =
+      "Bearer " +
+      jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET);
+    console.log(token, " token generateds");
+
+    res.status(200).json({
+      token: token,
+      userId: user.id,
+      username: user.username,
+    });
+  } catch (error) {
+    console.log("Error while signup: ", error);
+    return res.status(500).json({ message: "Some error has occurred" });
   }
-
-  const userId = uuidv4();
-  const userFileName = `users/${userId}.json`;
-  const salt = await bcryptjs.genSalt(10);
-  const hashedPassword = await bcryptjs.hash(data.password, salt);
-  const userMetadata = {
-    email: data.email,
-    password: hashedPassword,
-  };
-
-  const userFile = bucket.file(userFileName);
-  await userFile.save(JSON.stringify(userMetadata));
-
-  const token = "Bearer " + jwt.sign({ userId }, JWT_SECRET);
-
-  res.json({
-    message: "User created successfully",
-    token: token,
-  });
 });
 
 // Signin
 router.post("/signin", async (req, res) => {
-  const { success, data } = signinBody.safeParse(req.body);
-  if (!success) {
-    return res.json({
-      error: "Incorrect inputs",
-    });
-  }
-
-  const email = data.email;
-  const password = data.password;
-
   try {
-    const [userFiles] = await bucket.getFiles({
-      prefix: `users/`,
+    const { success, data } = signinBody.safeParse(req.body);
+
+    if (!success) {
+      return res.status(401).json({
+        error: "Incorrect inputs",
+      });
+    }
+
+    const email = data.email;
+    const password = data.password;
+
+    const userExists = await db.user.findUnique({
+      where: {
+        email: email,
+      },
     });
 
-    let found = false;
-    let token = "";
+    if (userExists) {
+      const passwordMatch = await bcryptjs.compare(
+        password,
+        userExists.password
+      );
 
-    for (const userFile of userFiles) {
-      let buffer = "";
-      console.log(userFile.file);
-
-      const data = await userFile.download();
-      console.log(data);
-
-      // userFile
-      //   .createReadStream()
-      //   .on("data", function (data) {
-      //     buffer += data;
-      //   })
-      //   .on("end", async function () {
-      //     const userData = JSON.parse(buffer);
-      //     console.log(password);
-      //     const passwordMatch = await bcryptjs.compare(
-      //       password,
-      //       userData.password
-      //     );
-
-      //     if (userData.email === email && passwordMatch) {
-      //       console.log(userData, " khajajadfasdfsd");
-      //       found = true;
-      //       token =
-      //         "Bearer " + jwt.sign({ userId: userFile.email }, JWT_SECRET);
-      //       return;
-      //     }
-      //   });
-
-      console.log("going again for the new file, ", found);
-      if (found) {
-        console.log("found it");
-        break;
+      if (!passwordMatch) {
+        return res.status(404).json({ error: "Invalid credentials" });
       }
-    }
 
-    // Send response for invalid email or password only if no valid user is found
-    if (found) {
-      res.json({ token });
+      const token =
+        "Bearer " +
+        jwt.sign(
+          { userId: userExists.id, username: userExists.username },
+          JWT_SECRET
+        );
+
+      res.status(200).json({
+        token: token,
+        userId: userExists.id,
+        username: userExists.username,
+      });
     } else {
-      res.json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "No user found" });
     }
   } catch (error) {
-    console.error("Error during user signin:", error);
-    res.json({ error: "Error during signin" });
-  }
-});
-
-// Update
-router.put("/", authMiddleware, async (req, res) => {
-  const { success, data } = updateBody.safeParse(req.body);
-  if (!success) {
-    res.status(411).json({
-      error: "Error while updating information",
-    });
-  }
-
-  const userId = req.userId;
-  const userFileName = `users/${userId}.json`;
-  const userFile = bucket.file(userFileName);
-  try {
-    const [userMetadata] = await userFile.get();
-    const userData = JSON.parse(userMetadata.toString());
-    const updatedUserData = { ...userData, ...data };
-    await userFile.save(JSON.stringify(updatedUserData));
-
-    res.json({
-      message: "Updated successfully",
-    });
-  } catch (error) {
-    console.error("Error during user update:", error);
-    res.status(500).json({ error: "Error during update" });
+    console.log("Error while signin: ", error);
+    return res.status(500).json({ message: "Some error has occurred" });
   }
 });
 
