@@ -51,7 +51,9 @@ router.post("/signup", async (req, res) => {
       },
     });
 
-    const token = "Bearer " + jwt.sign({ id: user.id }, JWT_SECRET);
+    const token =
+      "Bearer " +
+      jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET);
     console.log(token, " token generateds");
 
     res.status(200).json({
@@ -59,63 +61,60 @@ router.post("/signup", async (req, res) => {
       userId: user.id,
       username: user.username,
     });
-  } catch {
-    return res.status(500);
+  } catch (error) {
+    console.log("Error while signup: ", error);
+    return res.status(500).json({ message: "Some error has occurred" });
   }
 });
 
 // Signin
 router.post("/signin", async (req, res) => {
-  const { success, data } = signinBody.safeParse(req.body);
+  try {
+    const { success, data } = signinBody.safeParse(req.body);
 
-  if (!success) {
-    return res.status(401).json({
-      error: "Incorrect inputs",
-    });
-  }
-
-  const email = data.email;
-  const password = data.password;
-
-  const userExists = await db.user.findUnique({
-    where: {
-      email: email,
-    },
-    include: {
-      podcasts: {
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          createdAt: true,
-        },
-      },
-    },
-  });
-
-  if (userExists) {
-    const passwordMatch = await bcryptjs.compare(password, userExists.password);
-
-    if (!passwordMatch) {
-      return res.status(404).json({ error: "Invalid credentials" });
+    if (!success) {
+      return res.status(401).json({
+        error: "Incorrect inputs",
+      });
     }
 
-    const token =
-      "Bearer " +
-      jwt.sign(
-        { userId: userExists.id, username: userExists.username },
-        JWT_SECRET
+    const email = data.email;
+    const password = data.password;
+
+    const userExists = await db.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (userExists) {
+      const passwordMatch = await bcryptjs.compare(
+        password,
+        userExists.password
       );
 
-    console.log(userExists.podcasts);
-    res.status(200).json({
-      token: token,
-      userId: userExists.id,
-      username: userExists.username,
-      ...userExists.podcasts,
-    });
-  } else {
-    return res.status(401).json({ error: "No user found" });
+      if (!passwordMatch) {
+        return res.status(404).json({ error: "Invalid credentials" });
+      }
+
+      const token =
+        "Bearer " +
+        jwt.sign(
+          { userId: userExists.id, username: userExists.username },
+          JWT_SECRET
+        );
+
+      res.status(200).json({
+        token: token,
+        userId: userExists.id,
+        username: userExists.username,
+      });
+    } else {
+      return res.status(401).json({ error: "No user found" });
+    }
+  } catch (error) {
+    console.log("Error while signin: ", error);
+    return res.status(500).json({ message: "Some error has occurred" });
   }
 });
 
