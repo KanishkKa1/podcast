@@ -19,13 +19,16 @@ export default function Audio() {
 
   return (
     <>
-      <div style={{ border: "1px solid red", width: "50%" }}>
-        <VoiceVisualizer
-          ref={audioRef}
-          canvasContainerClassName="hidden"
-          controls={recorderControls}
-        />
-        {recorderControls.isAvailableRecordedAudio && <button>Upload</button>}
+      <div className="flex justify-center items-center h-screen">
+        <div className="border-2 border-black w-96 p-20">
+          <VoiceVisualizer
+            ref={audioRef}
+            canvasContainerClassName="hidden"
+            controls={recorderControls}
+          />
+          {recorderControls.isAvailableRecordedAudio && <div className="flex justify-center items-center">
+            <button className="bg-black text-white rounded-full py-2 px-4">Upload</button></div>}
+        </div>
       </div>
     </>
   );
