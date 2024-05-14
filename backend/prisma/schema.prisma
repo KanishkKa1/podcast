@@ -1,0 +1,29 @@
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String       @id @default(uuid())
+  createdAt DateTime     @default(now())
+  email     String       @unique
+  password  String
+  username  String       @unique
+  podcasts    Podcast[]
+}
+
+model Podcast {
+  id        String       @id @default(uuid())
+  createdAt DateTime     @default(now())
+  title     String?  @db.Text
+  content   String? @db.Text
+  audioUrl  String
+  updatedAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
