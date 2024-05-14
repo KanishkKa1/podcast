@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'
+import { Link as Route } from 'react-router-dom'
+import { Link as Scroll } from 'react-scroll'
 
 const Nav = () => {
 
@@ -10,11 +11,11 @@ const Nav = () => {
                     <h1 className='text-3xl font-extrabold text-yellow-400'>Here to Hear</h1>
                 </div>
                 <div>
-                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Home</span>
-                    <Link to='/pick'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Podcast</span></Link>
-                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Connect</span>
-                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Contact Us</span>
-                    <Link to='/login'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white'>Login</span></Link>
+                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white cursor-pointer'><Scroll to='home' smooth={true} duration={500}>Home</Scroll></span>
+                    <Route to='/pick'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white cursor-pointer'>Podcast</span></Route>
+                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white cursor-pointer'><Scroll to='connect' smooth={true} duration={500}>Connect</Scroll></span>
+                    <span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white cursor-pointer'><Scroll to='contact' smooth={true} duration={500}>Contact Us</Scroll></span>
+                    <Route to='/login'><span className='text-xl font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out hover:bg-yellow-400 hover:text-white cursor-pointer'>Login</span></Route>
 
                 </div>
             </div>

@@ -9,7 +9,7 @@ const Hero = () => {
     return (
         <>
             <div>
-                <div>
+                <div id='home'>
                     <video className="inset-0 object-contain" autoPlay muted loop>
                         <source src="/main.mp4" type="video/mp4" />
                         Your browser does not support the video tag.
