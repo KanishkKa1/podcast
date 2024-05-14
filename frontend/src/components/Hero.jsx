@@ -3,6 +3,7 @@ import Nav from './Nav'
 import Tiles from './Tiles'
 import PeaceZone from './PeaceZone'
 import ContactUs from './Contactus'
+import Footer from './Footer'
 
 const Hero = () => {
     return (
@@ -24,6 +25,7 @@ const Hero = () => {
             <PeaceZone />
             <Tiles />
             <ContactUs />
+            <Footer />
         </>
     )
 }
