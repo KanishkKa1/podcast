@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from './Card';
 import { FaTimes, FaHeart } from 'react-icons/fa';
+import { BiSolidUpvote } from "react-icons/bi";
+
 
 const Listener = () => {
     const [podcasts, setPodcasts] = useState([
@@ -53,13 +55,15 @@ const Listener = () => {
     ]);
     const [newComment, setNewComment] = useState('');
     const [upvoted, setUpvoted] = useState(false);
+    const [upvoteCount, setUpvoteCount] = useState(0);
+
 
     const openModal = async (podcastId) => {
         const podcast = podcasts.find(podcast => podcast.id === podcastId);
         setSelectedPodcast(podcast);
         const podcastComments = comments.filter(comment => comment.id === podcastId);
         setComments(podcastComments);
-        setUpvoted(false); // Reset upvote state when opening modal
+        setUpvoted(false);
     };
 
     const closeModal = () => {
@@ -94,6 +98,7 @@ const Listener = () => {
         if (upvoted == false) {
             setUpvoted(true);
         }
+        setUpvoteCount(upvoted ? upvoteCount - 1 : upvoteCount + 1);
     };
 
     return (
@@ -116,10 +121,11 @@ const Listener = () => {
                         <h2 className="text-2xl font-bold mb-2">{selectedPodcast.title}</h2>
                         <p className="text-gray-700 mb-4">{selectedPodcast.description}</p>
                         <audio controls src={selectedPodcast.audioUrl} className="w-full" />
-                        <div className="mt-4">
-                            <button onClick={handleUpvote} className={`text-xl ${upvoted ? 'text-red-500' : 'text-gray-500'}`}>
-                                <FaHeart /> {/* Heart icon */}
+                        <div className="mt-4 flex items-center">
+                            <button onClick={handleUpvote} className={`text-xl hover:text-2xl ${upvoted ? 'text-red-500' : 'text-gray-500'}`}>
+                                <BiSolidUpvote />
                             </button>
+                            <span className="ml-2">{upvoteCount}</span>
                         </div>
                         <div className="mt-4">
                             {comments.map((comment) => (
