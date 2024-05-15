@@ -50,7 +50,6 @@ router.post("/:commentId/upvote", authMiddleware, async (req, res) => {
   const userId = req.userId;
 
   try {
-    
     const existingUpvote = await db.upvoter.findFirst({
       where: {
         userId: userId,
@@ -91,7 +90,6 @@ router.post("/:commentId/upvote", authMiddleware, async (req, res) => {
         comment: updatedComment,
       });
     } else {
-
       await db.upvoter.create({
         data: {
           userId: userId,
@@ -99,7 +97,6 @@ router.post("/:commentId/upvote", authMiddleware, async (req, res) => {
         },
       });
 
-     
       const updatedComment = await db.comment.update({
         where: {
           id: commentId,
@@ -121,6 +118,5 @@ router.post("/:commentId/upvote", authMiddleware, async (req, res) => {
     res.status(500).send({ message: "Error toggling upvote" });
   }
 });
-
 
 module.exports = router;

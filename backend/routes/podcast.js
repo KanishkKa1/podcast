@@ -12,13 +12,35 @@ const storage = multer.memoryStorage({
 });
 const upload = multer({ storage: storage });
 
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/me", authMiddleware, async (req, res) => {
   try {
     const podcasts = await db.podcast.findMany({
       where: {
         userId: req.userId,
       },
       select: {
+        id: true,
+        userId: true,
+        title: true,
+        content: true,
+        image: true,
+        tags: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).send({ podcasts });
+  } catch (error) {
+    console.log("Error while retrieving products: ", error);
+    res.status(500).send({ message: "Error retrieving podcasts" });
+  }
+});
+
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    const podcasts = await db.podcast.findMany({
+      select: {
+        id: true,
         userId: true,
         title: true,
         content: true,
@@ -52,23 +74,13 @@ router.get("/:podcastId", authMiddleware, async (req, res) => {
       return res.status(404).send({ message: "Podcast not found" });
     }
 
-    const audioFile = bucket.file(podcast.audioUrl);
-
-    const audioStream = audioFile.createReadStream();
-    audioStream.pipe(res);
-    res.json({ podcast: podcast });
-
-    audioStream.on("error", (err) => {
-      console.error("Error streaming audio file:", err);
-      res.status(500).send({ message: "Error streaming audio file" });
-    });
+    return res.status(200).json(podcast);
   } catch (error) {
     console.error("Error retrieving podcast: ", error);
     res.status(500).send({ message: "Error retrieving podcast" });
   }
 });
 
-// TODO: Zod validations
 router.post(
   "/",
   authMiddleware,
@@ -113,13 +125,16 @@ router.post(
 
       Promise.all([imageStreamFinished, audioStreamFinished]).then(async () => {
         try {
+          await audioBlob.makePublic();
+          await imageBlob.makePublic();
+
           const uploadedPodcast = await db.podcast.create({
             data: {
               title,
               content,
               tags,
-              image: imageFileName,
-              audioUrl: audioFileName,
+              image: imageBlob.publicUrl(),
+              audioUrl: audioBlob.publicUrl(),
               user: {
                 connect: {
                   id: req.userId,
