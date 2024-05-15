@@ -13,7 +13,8 @@ const signupBody = zod.object({
 });
 
 const signinBody = zod.object({
-  email: zod.string().email(),
+  username: zod.string().optional(),
+  email: zod.string().email().optional(),
   password: zod.string(),
 });
 
@@ -79,13 +80,30 @@ router.post("/signin", async (req, res) => {
     }
 
     const email = data.email;
+    const username = data.username;
     const password = data.password;
 
-    const userExists = await db.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+    if (!email && !username) {
+      return res.status(401).json({
+        error: "Incorrect inputs",
+      });
+    }
+
+    let userExists =
+      email &&
+      (await db.user.findUnique({
+        where: {
+          email: email,
+        },
+      }));
+
+    if (!userExists) {
+      userExists = await db.user.findUnique({
+        where: {
+          username: username,
+        },
+      });
+    }
 
     if (userExists) {
       const passwordMatch = await bcryptjs.compare(

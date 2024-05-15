@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url = env("DATABASE_URL")
 }
 
@@ -13,17 +13,31 @@ model User {
   email     String       @unique
   password  String
   username  String       @unique
-  podcasts    Podcast[]
+  podcasts  Podcast[]
+  comments  Comment[]
 }
 
 model Podcast {
-  id        String       @id @default(uuid())
-  createdAt DateTime     @default(now())
-  title     String?  @db.Text
-  content   String? @db.Text
-  audioUrl  String
-  updatedAt DateTime @default(now())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  id          String       @id @default(uuid())
+  title       String       @db.Text
+  content     String       @db.Text
+  audioUrl    String
+  image       String
+  tags        String[]
+  userId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id])
+  comments    Comment[]
 }
 
+model Comment {
+  id          String       @id @default(uuid())
+  content     String       @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  userId      String
+  podcastId   String
+  user        User         @relation(fields: [userId], references: [id])
+  podcast     Podcast      @relation(fields: [podcastId], references: [id])
+}
