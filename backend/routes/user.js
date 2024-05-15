@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET, signinBody, signupBody } = require("../config");
 const bcryptjs = require("bcryptjs");
 const db = require("../prisma/index.js");
+const { authMiddleware } = require("../middleware.js");
 
 // signup
 router.post("/signup", async (req, res) => {
@@ -126,12 +127,10 @@ router.post("/signin", async (req, res) => {
 });
 
 // profile
-router.get("/profile", async (req, res) => {
-  const token = req.cookies.token;
-  if (token) {
+router.get("/profile", authMiddleware, async (req, res) => {
+  const userId = req.userId;
+  if (userId) {
     try {
-      const decodedToken = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
-      const userId = decodedToken.userId;
       const user = await db.user.findUnique({
         where: {
           id: userId,
