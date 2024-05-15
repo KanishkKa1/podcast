@@ -1,8 +1,7 @@
 require("dotenv").config();
 const zod = require("zod");
 
-
-const JWT_SECRET= process.env.JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const signupBody = zod.object({
   username: zod.string(),
@@ -11,7 +10,8 @@ const signupBody = zod.object({
 });
 
 const signinBody = zod.object({
-  email: zod.string().email(),
+  username: zod.string().optional(),
+  email: zod.string().email().optional(),
   password: zod.string(),
 });
 

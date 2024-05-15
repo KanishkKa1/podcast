@@ -6,18 +6,6 @@ const { JWT_SECRET, signinBody, signupBody } = require("../config");
 const bcryptjs = require("bcryptjs");
 const db = require("../prisma/index.js");
 
-const signupBody = zod.object({
-  username: zod.string(),
-  email: zod.string().email(),
-  password: zod.string(),
-});
-
-const signinBody = zod.object({
-  username: zod.string().optional(),
-  email: zod.string().email().optional(),
-  password: zod.string(),
-});
-
 // Signup
 router.post("/signup", async (req, res) => {
   try {
