@@ -15,6 +15,7 @@ model User {
   username  String       @unique
   podcasts  Podcast[]
   comments  Comment[]
+  upvotes   Upvoter[]
 }
 
 model Podcast {
@@ -34,10 +35,21 @@ model Podcast {
 model Comment {
   id          String       @id @default(uuid())
   content     String       @db.Text
+  upvotes     Int      @default(0)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
   userId      String
   podcastId   String
   user        User         @relation(fields: [userId], references: [id])
   podcast     Podcast      @relation(fields: [podcastId], references: [id])
+  upvoters    Upvoter[]
+}
+
+model Upvoter {
+  id         String  @id @default(uuid())
+  user       User    @relation(fields: [userId], references: [id])
+  userId     String
+  comment    Comment @relation(fields: [commentId], references: [id])
+  commentId  String
+  @@unique([userId, commentId])
 }
