@@ -41,10 +41,11 @@ export default function Audio() {
       const token = cookie?.value;
 
       const podcastData = new FormData();
-      podcastData.append("audio", recordedBlob.blob);
+      podcastData.append("audio", recordedBlob);
       podcastData.append("title", formData.title);
       podcastData.append("content", formData.content);
       podcastData.append("image", formData.image);
+      podcastData.append("tags", formData.tags);
 
       const response = await axios.post("/api/v1/podcast", podcastData, {
         headers: {
@@ -116,6 +117,14 @@ export default function Audio() {
                         name="content"
                         placeholder="Content"
                         value={formData.content}
+                        onChange={handleChange}
+                        className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      />
+                      <input
+                        type="text"
+                        name="tags"
+                        placeholder="Tags"
+                        value={formData.tags}
                         onChange={handleChange}
                         className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
