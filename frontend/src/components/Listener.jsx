@@ -2,67 +2,35 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from './Card';
 import { FaTimes, FaHeart } from 'react-icons/fa';
-import { BiSolidUpvote } from "react-icons/bi";
-
+import { BiSolidUpvote } from 'react-icons/bi';
 
 const Listener = () => {
-    const [podcasts, setPodcasts] = useState([
-        {
-            id: 1,
-            title: 'Podcast 1',
-            imageUrl: 'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg',
-            description: 'Description of Podcast 1',
-            audioUrl: 'https://example.com/audio1.mp3',
-        },
-        {
-            id: 2,
-            title: 'Podcast 2',
-            imageUrl: 'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg',
-            description: 'Description of Podcast 2',
-            audioUrl: 'https://example.com/audio2.mp3',
-        },
-        {
-            id: 3,
-            title: 'Podcast 3',
-            imageUrl: 'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg',
-            description: 'Description of Podcast 3  ',
-            audioUrl: 'https://example.com/audio2.mp3',
-        },
-        {
-            id: 4,
-            title: 'Podcast 4',
-            imageUrl: 'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg',
-            description: 'Description of Podcast 4',
-            audioUrl: 'https://example.com/audio2.mp3',
-        }
-    ]);
+    const [podcasts, setPodcasts] = useState([]);
     const [selectedPodcast, setSelectedPodcast] = useState(null);
-    const [comments, setComments] = useState([
-        {
-            id: 1,
-            user: {
-                username: 'User1',
-            },
-            content: 'Comment 1 for Podcast 1',
-        },
-        {
-            id: 2,
-            user: {
-                username: 'User2',
-            },
-            content: 'Comment 2 for Podcast 1',
-        },
-    ]);
+    const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [upvoted, setUpvoted] = useState(false);
     const [upvoteCount, setUpvoteCount] = useState(0);
 
+    useEffect(() => {
+        axios.get('/api/podcast/me')
+            .then(response => {
+                setPodcasts(response.data.podcasts);
+            })
+            .catch(error => {
+                console.error('Error fetching podcasts: ', error);
+            });
+    }, []);
 
     const openModal = async (podcastId) => {
-        const podcast = podcasts.find(podcast => podcast.id === podcastId);
-        setSelectedPodcast(podcast);
-        const podcastComments = comments.filter(comment => comment.id === podcastId);
-        setComments(podcastComments);
+        setSelectedPodcast(podcastId);
+        axios.get(`/api/podcast/${podcastId}`)
+            .then(response => {
+                setComments(response.data.comments);
+            })
+            .catch(error => {
+                console.error('Error fetching podcast details: ', error);
+            });
         setUpvoted(false);
     };
 
@@ -80,35 +48,35 @@ const Listener = () => {
             return; // Do not add empty comment
         }
 
-        const newCommentObj = {
-            id: comments.length + 1,
-            user: {
-                username: 'UserX', // Assuming a default username for now
-            },
-            content: newComment,
-        };
-        setComments([...comments, newCommentObj]);
-        setNewComment('');
+        axios.post(`/api/comment/${selectedPodcast}`, { comment: newComment })
+            .then(response => {
+                setComments([...comments, response.data.comment]);
+                setNewComment('');
+            })
+            .catch(error => {
+                console.error('Error adding comment: ', error);
+            });
     };
 
     const handleUpvote = () => {
-        if (upvoted == true) {
-            setUpvoted(false);
-        }
-        if (upvoted == false) {
-            setUpvoted(true);
-        }
-        setUpvoteCount(upvoted ? upvoteCount - 1 : upvoteCount + 1);
+        axios.post(`/api/comment/${selectedPodcast}/upvote`)
+            .then(response => {
+                setUpvoted(!upvoted);
+                setUpvoteCount(response.data.comment.upvotes);
+            })
+            .catch(error => {
+                console.error('Error toggling upvote: ', error);
+            });
     };
 
     return (
-        <div className="flex flex-wrap justify-center">
+        <div className="flex flex-wrap justify-center bg-slate-200">
             {podcasts.map((podcast) => (
                 <Card
                     key={podcast.id}
                     title={podcast.title}
-                    image={podcast.imageUrl}
-                    description={podcast.description}
+                    image={podcast.image}
+                    description={podcast.content}
                     onClick={() => openModal(podcast.id)}
                 />
             ))}
@@ -119,7 +87,7 @@ const Listener = () => {
                             <FaTimes />
                         </button>
                         <h2 className="text-2xl font-bold mb-2">{selectedPodcast.title}</h2>
-                        <p className="text-gray-700 mb-4">{selectedPodcast.description}</p>
+                        <p className="text-gray-700 mb-4">{selectedPodcast.content}</p>
                         <audio controls src={selectedPodcast.audioUrl} className="w-full" />
                         <div className="mt-4 flex items-center">
                             <button onClick={handleUpvote} className={`text-xl hover:text-2xl ${upvoted ? 'text-red-500' : 'text-gray-500'}`}>

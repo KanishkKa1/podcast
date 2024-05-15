@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
+import axios from "axios";
 
 export default function Audio() {
   const recorderControls = useVoiceVisualizer();
@@ -26,6 +27,24 @@ export default function Audio() {
     console.error(error);
   }, [error]);
 
+  const handleUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", recordedBlob.blob);
+
+      const response = await axios.post("/api/v1/podcast", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error uploading audio: ", error);
+    }
+  };
+
+
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="bg-white w-full h-screen relative">
@@ -42,7 +61,7 @@ export default function Audio() {
         </div>
         <div className="absolute bottom-0 left-0 right-0 text-center pb-8">
           {recorderControls.isAvailableRecordedAudio && (
-            <button className="bg-black text-white rounded-full py-2 px-4">Upload</button>
+            <button onClick={handleUpload} className="bg-black text-white rounded-full py-2 px-4">Upload</button>
           )}
         </div>
       </div>
