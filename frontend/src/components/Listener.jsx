@@ -10,7 +10,7 @@ const Listener = () => {
     useEffect(() => {
         const fetchPodcasts = async () => {
             try {
-                const response = await axios.get('http://localhost:5173/api/v1/podcast/');
+                const response = await axios.get('/api/v1/podcast/');
                 setPodcasts(response.data);
             } catch (error) {
                 console.error('Error fetching podcasts:', error);
@@ -22,10 +22,10 @@ const Listener = () => {
 
     const openModal = async (podcastId) => {
         try {
-            const response = await axios.get(`http://localhost:5173/api/v1/podcast/${podcastId}`);
+            const response = await axios.get(`/api/v1/podcast/${podcastId}`);
             setSelectedPodcast(response.data);
 
-            const commentsResponse = await axios.get(`http://localhost:5173/api/v1/podcast/${podcastId}`);
+            const commentsResponse = await axios.get(`/api/v1/podcast/${podcastId}`);
             setComments(commentsResponse.data);
         } catch (error) {
             console.error('Error fetching podcast details:', error);

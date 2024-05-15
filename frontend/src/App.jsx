@@ -6,6 +6,10 @@ import Speaker from './components/Speaker';
 import Hero from './components/Hero';
 import Signin from './components/Signin';
 import Signup from './components/signup';
+import axios from 'axios';
+
+axios.defaults.baseURL = "http://localhost:8000/";
+axios.defaults.withCredentials = true;
 
 function App() {
   return (

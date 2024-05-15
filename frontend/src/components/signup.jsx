@@ -129,7 +129,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/user/signup",
+        "/api/v1/user/signup",
         formData
       );
       console.log(response.data);
