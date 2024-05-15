@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -132,7 +135,13 @@ const Signup = () => {
         "/api/v1/user/signup",
         formData
       );
-      console.log(response.data);
+       if (response.error) {
+         toast.error(response.error);
+       } else {
+         setFormData({});
+         toast.success("Register Succesful. Welcome!");
+         navigate("/login");
+       }
     } catch (error) {
       console.error("Signup error: ", error);
     }

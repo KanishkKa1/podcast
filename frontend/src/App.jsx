@@ -6,6 +6,8 @@ import Speaker from './components/Speaker';
 import Hero from './components/Hero';
 import Signin from './components/Signin';
 import Signup from './components/signup';
+import { UserContextProvider } from "../context/userContext";
+import { Toaster } from "react-hot-toast";
 import axios from 'axios';
 
 axios.defaults.baseURL = "http://localhost:8000/";
@@ -13,16 +15,17 @@ axios.defaults.withCredentials = true;
 
 function App() {
   return (
-    <BrowserRouter>
+    <UserContextProvider>
+      <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
       <Routes>
-        <Route path='/' element={<Hero />} />
+        <Route path="/" element={<Hero />} />
         <Route path="/listener" element={<Listener />} />
         <Route path="/speaker" element={<Speaker />} />
         <Route path="/pick" element={<Pick />} />
-        <Route path='/login' element={<Signin />} />
-        <Route path='/signup' element={<Signup />} />
+        <Route path="/login" element={<Signin />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
-    </BrowserRouter>
+    </UserContextProvider>
   );
 }
 

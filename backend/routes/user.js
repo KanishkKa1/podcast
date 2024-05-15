@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET, signinBody, signupBody } = require("../config");
 const bcryptjs = require("bcryptjs");
 const db = require("../prisma/index.js");
 
-// Signup
+// signup
 router.post("/signup", async (req, res) => {
   try {
     const { success, data } = signupBody.safeParse(req.body);
@@ -40,11 +39,13 @@ router.post("/signup", async (req, res) => {
       },
     });
 
-    const token =
-      "Bearer " +
-      jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET);
-    console.log(token, " token generateds");
+    const token = jwt.sign(
+      { userId: user.id, username: user.username },
+      JWT_SECRET
+    );
 
+    // Send token in response headers
+    res.setHeader("Authorization", "Bearer " + token);
     res.status(200).json({
       token: token,
       userId: user.id,
@@ -56,7 +57,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Signin
+// signin
 router.post("/signin", async (req, res) => {
   try {
     const { success, data } = signinBody.safeParse(req.body);
@@ -103,13 +104,13 @@ router.post("/signin", async (req, res) => {
         return res.status(404).json({ error: "Invalid credentials" });
       }
 
-      const token =
-        "Bearer " +
-        jwt.sign(
-          { userId: userExists.id, username: userExists.username },
-          JWT_SECRET
-        );
+      const token = jwt.sign(
+        { userId: userExists.id, username: userExists.username },
+        JWT_SECRET
+      );
 
+      // Send token in response headers
+      res.setHeader("Authorization", "Bearer " + token);
       res.status(200).json({
         token: token,
         userId: userExists.id,
@@ -121,6 +122,37 @@ router.post("/signin", async (req, res) => {
   } catch (error) {
     console.log("Error while signin: ", error);
     return res.status(500).json({ message: "Some error has occurred" });
+  }
+});
+
+// profile
+router.get("/profile", async (req, res) => {
+  const token = req.cookies.token;
+  if (token) {
+    try {
+      const decodedToken = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
+      const userId = decodedToken.userId;
+      const user = await db.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+        },
+      });
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching user profile: ", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  } else {
+    res.json({ error: "Unauthorized" });
   }
 });
 
