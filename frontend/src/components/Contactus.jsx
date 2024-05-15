@@ -3,7 +3,7 @@ import React from 'react'
 const Contactus = () => {
     return (
         <>
-            <div className='flex justify-center items-center w-full my-20'>
+            <div id='contact' className='flex justify-center items-center w-full my-20'>
                 <h1 className='text-4xl font-bold'>Don't be shy, Write to us!</h1>
             </div>
             <div className='flex justify-center items-center '>

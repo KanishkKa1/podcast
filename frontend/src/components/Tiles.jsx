@@ -3,7 +3,7 @@ import React from 'react';
 const Tiles = () => {
     return (
         <>
-            <div className='flex justify-center items-center mt-20 '>
+            <div id='connect' className='flex justify-center items-center mt-20 '>
                 <h1 className='text-4xl font-bold'>Connect</h1>
             </div>
             <div className="flex justify-center items-start mt-10 w-full">
