@@ -127,10 +127,12 @@ router.post("/signin", async (req, res) => {
 });
 
 // profile
-router.get("/profile", authMiddleware, async (req, res) => {
-  const userId = req.userId;
-  if (userId) {
+router.get("/profile", async (req, res) => {
+  const token = req.cookies.token;
+  if (token) {
     try {
+      const decodedToken = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
+      const userId = decodedToken.userId;
       const user = await db.user.findUnique({
         where: {
           id: userId,

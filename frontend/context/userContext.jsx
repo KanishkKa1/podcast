@@ -7,18 +7,16 @@ export function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (!user) {
-      axios
-        .get("/api/v1/user/profile")
-        .then(({ data }) => {
-          setUser(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching profile:", error);
-          setUser(null);
-        });
-    }
-  }, []);
+    axios
+      .get("/api/v1/user/profile", { withCredentials: true })
+      .then(({ data }) => {
+        setUser(data); // Set the user if the request is successful
+      })
+      .catch((error) => {
+        console.error("Error fetching profile:", error);
+        setUser(null); // Set the user to null if the request fails
+      });
+  }, []); // Run only once when the component mounts
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
