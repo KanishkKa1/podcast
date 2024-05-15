@@ -135,13 +135,13 @@ const Signup = () => {
         "/api/v1/user/signup",
         formData
       );
-       if (response.error) {
-         toast.error(response.error);
-       } else {
-         setFormData({});
-         toast.success("Register Succesful. Welcome!");
-         navigate("/login");
-       }
+      if (response.error) {
+        toast.error(response.error);
+      } else {
+        setFormData({});
+        toast.success("Register Succesful. Welcome!");
+        navigate("/login");
+      }
     } catch (error) {
       console.error("Signup error: ", error);
     }
@@ -164,14 +164,7 @@ const Signup = () => {
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
+
           <input
             type="email"
             name="email"
@@ -187,6 +180,15 @@ const Signup = () => {
             value={formData.password}
             onChange={handleChange}
             className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-4"
+          />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            disabled
+            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
           <button
             type="button"
