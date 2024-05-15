@@ -13,13 +13,43 @@ const Listener = () => {
     const [upvoteCount, setUpvoteCount] = useState(0);
 
     useEffect(() => {
-        axios.get('/api/podcast/me')
-            .then(response => {
+        const fetchPodcasts = async () => {
+            try {
+                const cookie = await cookieStore.get("token");
+                const token = cookie?.value;
+
+                const response = await axios.get('/api/v1/podcast', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 setPodcasts(response.data.podcasts);
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error fetching podcasts: ', error);
-            });
+            }
+        };
+
+        fetchPodcasts();
+    }, []);
+
+    useEffect(() => {
+        const fetchUserPodcasts = async () => {
+            try {
+                const cookie = await cookieStore.get("token");
+                const token = cookie?.value;
+
+                const response = await axios.get('/api/v1/podcast/me', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setPodcasts(response.data.podcasts);
+            } catch (error) {
+                console.error('Error fetching current user\'s podcasts: ', error);
+            }
+        };
+
+        fetchUserPodcasts();
     }, []);
 
     const openModal = async (podcastId) => {
