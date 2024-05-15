@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import RandomNames from "./RandomNames";
 
 const Pick = () => {
   return (
@@ -37,7 +36,6 @@ const Pick = () => {
           </Link>
         </div>
       </div>
-      {/* <RandomNames /> */}
     </div>
   );
 };
