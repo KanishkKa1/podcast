@@ -10,31 +10,29 @@ const Pick = () => {
         </h1>
       </div>
       <div className="flex justify-center items-center w-8/12 lg:w-[700px] h-96 mb-2">
-        <div
-          className="flex justify-center items-center rounded-xl w-full h-full mx-5 hover:shadow-xl hover:shadow-black"
+        <Link
+          to="/speaker"
+          className="flex justify-center items-center rounded-xl w-full h-full mx-5 hover:shadow-xl hover:shadow-black transition duration-100"
           style={{
             backgroundImage: "url('/speaker.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
-          <Link to="/speaker" className="item">
-            <span className="text-3xl text-white font-bold">Speaker</span>
-          </Link>
-        </div>
+          <span className="text-3xl text-white font-bold">Speaker</span>
+        </Link>
 
-        <div
-          className="flex justify-center items-center rounded-xl w-full h-full mx-5 hover:shadow-xl hover:shadow-black"
+        <Link
+          to="/listener"
+          className="flex justify-center items-center rounded-xl w-full h-full mx-5 hover:shadow-xl hover:shadow-black transition duration-100"
           style={{
             backgroundImage: "url('/listener.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
-          <Link to="/listener" className="item">
-            <span className="text-3xl text-white font-bold">Listener</span>
-          </Link>
-        </div>
+          <span className="text-3xl text-white font-bold">Listener</span>
+        </Link>
       </div>
     </div>
   );

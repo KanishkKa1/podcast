@@ -3,6 +3,8 @@ import axios from "axios";
 import Card from "./Card";
 import { FaTimes, FaHeart } from "react-icons/fa";
 import { BiLogIn, BiSolidUpvote } from "react-icons/bi";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const Listener = () => {
@@ -51,6 +53,14 @@ const Listener = () => {
     fetchUserPodcasts();
   }, []);
 
+  useEffect(() => {
+    if (selectedPodcast) {
+      fetchTopComments();
+      const interval = setInterval(fetchTopComments, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedPodcast]);
+
   const openModal = async (podcastId) => {
     const token = Cookies.get("token");
     setSelectedPodcast(podcastId);
@@ -62,7 +72,6 @@ const Listener = () => {
       })
       .then((response) => {
         setSelectedPodcast(response.data);
-        setComments(response.data.comments);
       })
       .catch((error) => {
         console.error("Error fetching podcast details: ", error);
@@ -99,43 +108,47 @@ const Listener = () => {
         }
       )
       .then((response) => {
-        setComments([...comments, response.data.comment]);
+        setComments([response.data.comment, ...comments]);
         setNewComment("");
       })
       .catch((error) => {
+        toast.error("Error adding comment, please try again later!");
         console.error("Error adding comment: ", error);
       });
   };
 
-  // const handleUpvote = () => {
-  //   const token = Cookies.get("token");
+  const fetchTopComments = () => {
+    const token = Cookies.get("token");
 
-  //   axios
-  //     .post(`/api/v1/comment/${selectedPodcast.id}/upvote`, {
-  //       header: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       setUpvoted(!upvoted);
-  //       setUpvoteCount(response.data.comment.upvotes);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error toggling upvote: ", error);
-  //     });
-  // };
+    axios
+      .get(`/api/v1/comment/${selectedPodcast.id}/3`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setComments(response.data.comments);
+      })
+      .catch((error) => {
+        toast.error("Error fetching comments, please try again later!");
+        console.error("Error fetching comments: ", error);
+      });
+  };
 
   return (
-    <div className="flex flex-wrap justify-center bg-slate-200">
-      {podcasts.map((podcast) => (
-        <Card
-          key={podcast.id}
-          title={podcast.title}
-          image={podcast.image}
-          description={podcast.content}
-          onClick={() => openModal(podcast.id)}
-        />
-      ))}
+    <div className="bg-slate-200 p-1">
+      <h1 className="text-2xl  text-center m-3">Podcasts</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center bg-slate-200">
+        {podcasts.map((podcast) => (
+          <Card
+            key={podcast.id}
+            title={podcast.title}
+            image={podcast.image}
+            description={podcast.content}
+            onClick={() => openModal(podcast.id)}
+          />
+        ))}
+      </div>
       {selectedPodcast && (
         <div className="fixed inset-0 z-10 overflow-y-auto bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-8 max-w-lg w-full rounded-lg shadow-lg relative">
