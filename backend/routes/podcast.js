@@ -92,7 +92,7 @@ router.post(
     // Changed to async function for better error handling
     try {
       const { title, content } = req.body;
-      const tags = JSON.parse(req.body.tags); 
+      const tags = JSON.parse(req.body.tags);
 
       const image = req.files["image"]?.[0];
       const audio = req.files["audio"][0];
@@ -133,7 +133,7 @@ router.post(
             data: {
               title,
               content,
-              tags, 
+              tags,
               image: imageBlob.publicUrl(),
               audioUrl: audioBlob.publicUrl(),
               user: {
@@ -166,4 +166,27 @@ router.post(
     }
   }
 );
+
+router.delete("/:podcastId", authMiddleware, async (req, res) => {
+  const { podcastId } = req.params;
+
+  try {
+    const podcast = await db.podcast.delete({
+      where: {
+        id: podcastId,
+        userId: req.userId,
+      },
+    });
+
+    if (!podcast) {
+      return res.status(404).send({ message: "Podcast not found" });
+    }
+
+    return res.status(201).json({ message: "Podcast deleted successfully" });
+  } catch (error) {
+    console.error("Error while deleting podcast: ", error);
+    res.status(500).send({ message: "Error while deleting podcast" });
+  }
+});
+
 module.exports = router;
