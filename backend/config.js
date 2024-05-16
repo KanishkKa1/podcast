@@ -10,8 +10,7 @@ const signupBody = zod.object({
 });
 
 const signinBody = zod.object({
-  username: zod.string().optional(),
-  email: zod.string().email().optional(),
+  emailOrUsername: zod.string(),
   password: zod.string(),
 });
 

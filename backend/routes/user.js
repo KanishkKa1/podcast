@@ -69,28 +69,19 @@ router.post("/signin", async (req, res) => {
       });
     }
 
-    const email = data.email;
-    const username = data.username;
+    const emailOrUsername = data.emailOrUsername;
     const password = data.password;
 
-    if (!email && !username) {
-      return res.status(401).json({
-        error: "Incorrect inputs",
-      });
-    }
-
-    let userExists =
-      email &&
-      (await db.user.findUnique({
-        where: {
-          email: email,
-        },
-      }));
+    let userExists = await db.user.findUnique({
+      where: {
+        email: emailOrUsername,
+      },
+    });
 
     if (!userExists) {
       userExists = await db.user.findUnique({
         where: {
-          username: username,
+          username: emailOrUsername,
         },
       });
     }

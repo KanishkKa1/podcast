@@ -42,8 +42,8 @@ export default function Audio() {
     event.preventDefault();
 
     try {
-      const { title, content, tags, file } = formData;
-      if (!title || !content || !tags || (!file && !recordedBlob)) {
+      const { title, content, tags, file, image } = formData;
+      if (!title || !content || !tags || (!file && !recordedBlob) || !image) {
         toast.error("Please fill all required fields.");
         return;
       }
@@ -65,7 +65,7 @@ export default function Audio() {
       const response = await axios.post("/api/v1/podcast/", podcastData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data", 
+          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -118,7 +118,9 @@ export default function Audio() {
           <div className="audio-wave-container w-10/12">
             <VoiceVisualizer
               ref={audioRef}
-              canvasContainerClassName={`audio-wave ${isAnimating ? "animate" : ""}`}
+              canvasContainerClassName={`audio-wave ${
+                isAnimating ? "animate" : ""
+              }`}
               controls={recorderControls}
               mainBarColor="black"
               secondaryBarColor="black"
@@ -135,7 +137,10 @@ export default function Audio() {
           {showModal && (
             <div className="fixed inset-0 z-10 overflow-y-auto bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div className="bg-white p-8 max-w-md w-full rounded-lg shadow-lg relative">
-                <button onClick={toggleModal} className="absolute top-2 right-2 text-gray-500">
+                <button
+                  onClick={toggleModal}
+                  className="absolute top-2 right-2 text-gray-500"
+                >
                   <FaTimes />
                 </button>
                 <h2 className="text-2xl font-bold mb-2">
@@ -155,6 +160,7 @@ export default function Audio() {
                     type="file"
                     accept=".mp3,.wav"
                     onChange={handleFileChange}
+                    disabled={recordedBlob ? true : false}
                     className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                   <input

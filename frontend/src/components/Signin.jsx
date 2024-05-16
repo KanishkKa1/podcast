@@ -9,7 +9,7 @@ const Signin = () => {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [data, setData] = useState({
-    email: "",
+    emailOrUsername: "",
     password: "",
   });
 
@@ -28,18 +28,16 @@ const Signin = () => {
       const { data: userData } = await axios.post("/api/v1/user/signin", data);
       if (userData.error) {
         toast.error(userData.error);
-        
+
         setUser(null);
         document.cookie = "token=;path=/;max-age=-1";
       } else {
-        
         setUser(userData);
         toast.success("Login Successful. Welcome!");
 
-        
         document.cookie = `token=${userData.token};path=/;max-age=3600`;
 
-        setData({ email: "", password: "" }); 
+        setData({ emailOrUsername: "", password: "" });
         navigate("/");
       }
     } catch (error) {
@@ -60,9 +58,9 @@ const Signin = () => {
           onSubmit={handleSubmit}
         >
           <input
-            type="email"
-            name="email"
-            placeholder="Email"
+            type="text"
+            name="emailOrUsername"
+            placeholder="Username or email"
             value={data.email}
             onChange={handleChange}
             className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
