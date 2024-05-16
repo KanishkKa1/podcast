@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
 import axios from "axios";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export default function Audio() {
+  const navigate = useNavigate();
   const recorderControls = useVoiceVisualizer();
   const { recordedBlob, audioRef, isRecording } = recorderControls;
   const [isAnimating, setIsAnimating] = useState(false);
@@ -16,65 +20,90 @@ export default function Audio() {
   });
 
   useEffect(() => {
-    if (isRecording) {
-      setIsAnimating(true);
-    } else {
-      setIsAnimating(false);
-    }
+    setIsAnimating(isRecording);
   }, [isRecording]);
 
   useEffect(() => {
-    if (!recordedBlob) return;
-
-    console.log(recordedBlob);
+    if (recordedBlob) {
+      console.log(recordedBlob);
+    }
   }, [recordedBlob]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData({
-      ...formData,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       file: file,
-    });
+    }));
   };
 
   const handleUpload = async (event) => {
     event.preventDefault();
 
     try {
-      const podcastData = new FormData();
-      podcastData.append("audio", formData.file || recordedBlob.blob);
-      podcastData.append("title", formData.title);
-      podcastData.append("content", formData.content);
-      podcastData.append("image", formData.image);
-      podcastData.append("tags", [formData.tags]);
+      const { title, content, tags, file } = formData;
+      if (!title || !content || !tags || (!file && !recordedBlob)) {
+        toast.error("Please fill all required fields.");
+        return;
+      }
 
-      const response = await axios.post("/api/v1/podcast", podcastData);
+      const token = Cookies.get("token");
+      const podcastData = new FormData();
+      podcastData.append("audio", file || recordedBlob);
+      podcastData.append("title", title);
+      podcastData.append("content", content);
+      podcastData.append("tags", JSON.stringify(tags));
+
+      if (formData.image) {
+        podcastData.append("image", formData.image);
+      }
+
+      const response = await axios.post("/api/v1/podcast/", podcastData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else {
+        setFormData({
+          title: "",
+          content: "",
+          image: null,
+          tags: "",
+          file: null,
+        });
+        toast.success("Podcast uploaded successfully!");
+        navigate("/listener");
+      }
 
       console.log(response.data);
       toggleModal();
     } catch (error) {
       console.error("Error uploading audio: ", error);
+      toast.error("Error uploading audio. Please try again later.");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       [name]: value,
-    });
+    }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setFormData({
-      ...formData,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       image: file,
-    });
+    }));
   };
 
   const toggleModal = () => {
-    setShowModal(!showModal);
+    setShowModal((prevShowModal) => !prevShowModal);
   };
 
   return (
@@ -84,7 +113,9 @@ export default function Audio() {
           <div className="audio-wave-container w-10/12">
             <VoiceVisualizer
               ref={audioRef}
-              canvasContainerClassName={`audio-wave ${isAnimating ? 'animate' : ''}`}
+              canvasContainerClassName={`audio-wave ${
+                isAnimating ? "animate" : ""
+              }`}
               controls={recorderControls}
               mainBarColor="black"
               secondaryBarColor="black"
@@ -92,15 +123,28 @@ export default function Audio() {
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 text-center pb-8">
-          <button onClick={toggleModal} className="bg-black text-white rounded-full py-2 px-4">
+          <button
+            onClick={toggleModal}
+            className="bg-black text-white rounded-full py-2 px-4"
+          >
             Upload Your File
           </button>
           {showModal && (
             <div className="fixed inset-0 z-10 overflow-y-auto bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div className="bg-white p-8 max-w-md w-full rounded-lg shadow-lg relative">
-                <h2 className="text-2xl font-bold mb-2">Upload Podcast Details</h2>
-                <form className="mt-4 space-y-4" onSubmit={handleUpload}>
-                  <div className="text-left"><p className="bg-yellow-100 p-2">If not recorded, upload your own file here 👇</p></div>
+                <h2 className="text-2xl font-bold mb-2">
+                  Upload Podcast Details
+                </h2>
+                <form
+                  className="mt-4 space-y-4"
+                  onSubmit={handleUpload}
+                  encType="multipart/form-data"
+                >
+                  <div className="text-left">
+                    <p className="bg-yellow-100 p-2">
+                      If not recorded, upload your own file here 👇
+                    </p>
+                  </div>
                   <input
                     type="file"
                     accept=".mp3,.wav"
@@ -136,7 +180,10 @@ export default function Audio() {
                     onChange={handleImageChange}
                     className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
-                  <button type="submit" className="bg-black text-white rounded-full py-2 px-4">
+                  <button
+                    type="submit"
+                    className="bg-black text-white rounded-full py-2 px-4"
+                  >
                     Submit
                   </button>
                 </form>

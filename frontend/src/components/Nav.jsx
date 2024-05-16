@@ -2,14 +2,16 @@ import React, { useContext } from "react";
 import { Link as Route } from "react-router-dom";
 import { Link as Scroll } from "react-scroll";
 import { UserContext } from "../../context/userContext";
+import Cookies from "js-cookie";
 
 const Nav = () => {
   const { user, setUser } = useContext(UserContext);
 
   const handleLogout = () => {
     setUser(null);
-    document.cookie = "token=;path=/;max-age=-1";
+    Cookies.remove("token"); 
   };
+
 
   return (
     <div className="shadow-2xl p-1 w-full fixed top-0 left-0 bg-white">
