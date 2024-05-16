@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { UserContext } from "../../context/userContext";
 import { Link } from "react-router-dom";
 
@@ -29,14 +28,18 @@ const Signin = () => {
       const { data: userData } = await axios.post("/api/v1/user/signin", data);
       if (userData.error) {
         toast.error(userData.error);
+        
+        setUser(null);
+        document.cookie = "token=;path=/;max-age=-1";
       } else {
-        setData({});
+        
         setUser(userData);
         toast.success("Login Successful. Welcome!");
 
-        // Set token in cookies
+        
         document.cookie = `token=${userData.token};path=/;max-age=3600`;
 
+        setData({ email: "", password: "" }); 
         navigate("/");
       }
     } catch (error) {
@@ -90,7 +93,7 @@ const Signin = () => {
         </form>
       </div>
       <div>
-        <img src="/mic.jpg" className="w-70 h-96 rounded-lg" />
+        <img src="/mic.jpg" className="w-70 h-96 rounded-lg" alt="Microphone" />
       </div>
     </div>
   );
