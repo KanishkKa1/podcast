@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { FaTimes } from "react-icons/fa";
 
 export default function Audio() {
   const navigate = useNavigate();
@@ -53,10 +54,6 @@ export default function Audio() {
       podcastData.append("title", title);
       podcastData.append("content", content);
       podcastData.append("tags", JSON.stringify(tags));
-
-      if (formData.image) {
-        podcastData.append("image", formData.image);
-      }
 
       const response = await axios.post("/api/v1/podcast/", podcastData, {
         headers: {
@@ -113,9 +110,7 @@ export default function Audio() {
           <div className="audio-wave-container w-10/12">
             <VoiceVisualizer
               ref={audioRef}
-              canvasContainerClassName={`audio-wave ${
-                isAnimating ? "animate" : ""
-              }`}
+              canvasContainerClassName={`audio-wave ${isAnimating ? "animate" : ""}`}
               controls={recorderControls}
               mainBarColor="black"
               secondaryBarColor="black"
@@ -132,6 +127,9 @@ export default function Audio() {
           {showModal && (
             <div className="fixed inset-0 z-10 overflow-y-auto bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div className="bg-white p-8 max-w-md w-full rounded-lg shadow-lg relative">
+                <button onClick={toggleModal} className="absolute top-2 right-2 text-gray-500">
+                  <FaTimes />
+                </button>
                 <h2 className="text-2xl font-bold mb-2">
                   Upload Podcast Details
                 </h2>
