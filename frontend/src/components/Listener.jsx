@@ -3,6 +3,7 @@ import axios from "axios";
 import Card from "./Card";
 import { FaTimes, FaHeart } from "react-icons/fa";
 import { BiSolidUpvote } from "react-icons/bi";
+import Cookies from "js-cookie";
 
 const Listener = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -15,8 +16,7 @@ const Listener = () => {
   useEffect(() => {
     const fetchPodcasts = async () => {
       try {
-        const cookie = await cookieStore.get("token");
-        const token = cookie?.value;
+        const token = Cookies.get("token");
 
         const response = await axios.get("/api/v1/podcast", {
           headers: {
@@ -35,8 +35,7 @@ const Listener = () => {
   useEffect(() => {
     const fetchUserPodcasts = async () => {
       try {
-        const cookie = await cookieStore.get("token");
-        const token = cookie?.value;
+        const token = Cookies.get("token");
 
         const response = await axios.get("/api/v1/podcast/me", {
           headers: {
@@ -76,7 +75,7 @@ const Listener = () => {
 
   const addComment = () => {
     if (newComment.trim() === "") {
-      return; // Do not add empty comment
+      return; 
     }
 
     axios
