@@ -58,11 +58,14 @@ export default function Audio() {
       podcastData.append("title", title);
       podcastData.append("content", content);
       podcastData.append("tags", JSON.stringify(tags.split(",")));
+      if (formData.image) {
+        podcastData.append("image", formData.image);
+      }
 
       const response = await axios.post("/api/v1/podcast/", podcastData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data", // Ensure correct content type header
+          "Content-Type": "multipart/form-data", 
         },
       });
 
