@@ -15,7 +15,7 @@ const Signup = () => {
   const RandomUsername = () => {
     const prefix = [
       "Rain", "Sun", "Cloud", "Moon", "Star", "Sky", "Ocean", "Forest", "Mountain", "River", "Flower",
-      "Leaf", "Rock", "Wave", "Wind", "Snow", "Fire", "Ice", "Earth", "Sand", "Morning", "Evening", 
+      "Leaf", "Rock", "Wave", "Wind", "Snow", "Fire", "Ice", "Earth", "Sand", "Morning", "Evening",
       "Night", "Day", "Spring", "Summer", "Autumn", "Winter", "Dawn", "Dusk", "Light", "Dark", "Space",
       "Time", "Life", "Dream", "Hope", "Love", "Joy", "Peace", "Music", "Art", "Poem", "Story", "Dream",
       "Wisdom", "Truth", "Magic", "Hero", "Legend", "Brave", "Kind", "Wise", "Gentle", "Strong", "Happy",
@@ -55,7 +55,7 @@ const Signup = () => {
         });
         toast.success("Registration Successful. Welcome!");
 
-     
+
         navigate("/login");
       }
     } catch (error) {
@@ -74,7 +74,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-200 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 shadow-sm">
+      <div className="max-w-md w-full space-y-8 bg-white py-3 px-10 rounded-lg shadow-sm">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign up for an account

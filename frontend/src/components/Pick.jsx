@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Pick = () => {
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center mt-16">
       <div className="flex justify-center items-center">
         <h1 className="text-4xl my-10 font-bold">
           Are you here to tell a story or listen to one?
