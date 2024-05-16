@@ -33,6 +33,13 @@ router.post("/:podcastId", authMiddleware, async (req, res) => {
           },
         },
       },
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
 
     res.status(201).send({

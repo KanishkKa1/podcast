@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from "./Card";
 import { FaTimes, FaHeart } from "react-icons/fa";
-import { BiSolidUpvote } from "react-icons/bi";
+import { BiLogIn, BiSolidUpvote } from "react-icons/bi";
 import Cookies from "js-cookie";
 
 const Listener = () => {
@@ -37,7 +37,7 @@ const Listener = () => {
       try {
         const token = Cookies.get("token");
 
-        const response = await axios.get("/api/v1/podcast/me", {
+        const response = await axios.get("/api/v1/podcast/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -52,10 +52,16 @@ const Listener = () => {
   }, []);
 
   const openModal = async (podcastId) => {
+    const token = Cookies.get("token");
     setSelectedPodcast(podcastId);
     axios
-      .get(`/api/v1/podcast/${podcastId}`)
+      .get(`/api/v1/podcast/${podcastId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
+        setSelectedPodcast(response.data);
         setComments(response.data.comments);
       })
       .catch((error) => {
@@ -74,12 +80,24 @@ const Listener = () => {
   };
 
   const addComment = () => {
+    const token = Cookies.get("token");
+
     if (newComment.trim() === "") {
-      return; 
+      return;
     }
 
     axios
-      .post(`/api/v1/comment/${selectedPodcast}`, { comment: newComment })
+      .post(
+        `/api/v1/comment/${selectedPodcast.id}`,
+        {
+          comment: newComment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((response) => {
         setComments([...comments, response.data.comment]);
         setNewComment("");
@@ -89,17 +107,23 @@ const Listener = () => {
       });
   };
 
-  const handleUpvote = () => {
-    axios
-      .post(`/api/v1/comment/${selectedPodcast}/upvote`)
-      .then((response) => {
-        setUpvoted(!upvoted);
-        setUpvoteCount(response.data.comment.upvotes);
-      })
-      .catch((error) => {
-        console.error("Error toggling upvote: ", error);
-      });
-  };
+  // const handleUpvote = () => {
+  //   const token = Cookies.get("token");
+
+  //   axios
+  //     .post(`/api/v1/comment/${selectedPodcast.id}/upvote`, {
+  //       header: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     })
+  //     .then((response) => {
+  //       setUpvoted(!upvoted);
+  //       setUpvoteCount(response.data.comment.upvotes);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error toggling upvote: ", error);
+  //     });
+  // };
 
   return (
     <div className="flex flex-wrap justify-center bg-slate-200">
@@ -124,22 +148,18 @@ const Listener = () => {
             <h2 className="text-2xl font-bold mb-2">{selectedPodcast.title}</h2>
             <p className="text-gray-700 mb-4">{selectedPodcast.content}</p>
             <audio controls src={selectedPodcast.audioUrl} className="w-full" />
-            <div className="mt-4 flex items-center">
-              <button
-                onClick={handleUpvote}
-                className={`text-xl hover:text-2xl ${
-                  upvoted ? "text-red-500" : "text-gray-500"
-                }`}
-              >
-                <BiSolidUpvote />
-              </button>
-              <span className="ml-2">{upvoteCount}</span>
-            </div>
             <div className="mt-4">
               {comments.map((comment) => (
                 <div key={comment.id} className="border-b py-2">
                   <p className="font-bold">{comment.user.username}</p>
                   <p>{comment.content}</p>
+                  <button
+                    className={`text-xl hover:text-2xl ${
+                      upvoted ? "text-red-500" : "text-gray-500"
+                    }`}
+                  >
+                    <BiSolidUpvote />
+                  </button>
                 </div>
               ))}
             </div>

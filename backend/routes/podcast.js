@@ -66,7 +66,17 @@ router.get("/:podcastId", authMiddleware, async (req, res) => {
         id: podcastId,
       },
       include: {
-        comments: true,
+        comments: {
+          select: {
+            user: {
+              select: {
+                username: true,
+              },
+            },
+            content: true,
+            id: true,
+          },
+        },
       },
     });
 
