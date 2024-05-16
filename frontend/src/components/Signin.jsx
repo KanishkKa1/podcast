@@ -41,6 +41,7 @@ const Signin = () => {
         navigate("/");
       }
     } catch (error) {
+      toast.error("Login error");
       console.error("Signin error: ", error);
     }
   };

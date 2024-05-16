@@ -59,6 +59,7 @@ const Signup = () => {
         navigate("/login");
       }
     } catch (error) {
+      toast.error("Signin error");
       console.error("Signup error: ", error);
     }
   };

@@ -52,6 +52,33 @@ router.post("/:podcastId", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/:podcastId/:num", authMiddleware, async (req, res) => {
+  const { podcastId, num } = req.params;
+
+  try {
+    const comments = await db.comment.findMany({
+      where: {
+        podcastId: podcastId,
+      },
+      take: parseInt(num),
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).send({ comments });
+  } catch (error) {
+    console.error("Error fetching comments: ", error);
+    res.status(500).send({ message: "Error fetching comments" });
+  }
+});
+
+
+
 router.post("/:commentId/upvote", authMiddleware, async (req, res) => {
   const { commentId } = req.params;
   const userId = req.userId;
