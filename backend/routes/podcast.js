@@ -92,7 +92,7 @@ router.post(
     // Changed to async function for better error handling
     try {
       const { title, content } = req.body;
-      const tags = JSON.parse(req.body.tags); // Parse tags to ensure it's an array
+      const tags = JSON.parse(req.body.tags); 
 
       const image = req.files["image"]?.[0];
       const audio = req.files["audio"][0];
@@ -133,7 +133,7 @@ router.post(
             data: {
               title,
               content,
-              tags, // Use parsedTags here
+              tags, 
               image: imageBlob.publicUrl(),
               audioUrl: audioBlob.publicUrl(),
               user: {
@@ -166,7 +166,4 @@ router.post(
     }
   }
 );
-module.exports = router;
-
-
 module.exports = router;
