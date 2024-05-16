@@ -50,14 +50,19 @@ export default function Audio() {
 
       const token = Cookies.get("token");
       const podcastData = new FormData();
-      podcastData.append("audio", file || recordedBlob);
+      if (recordedBlob) {
+        podcastData.append("audio", recordedBlob, "recording.wav");
+      } else if (file) {
+        podcastData.append("audio", file);
+      }
       podcastData.append("title", title);
       podcastData.append("content", content);
-      podcastData.append("tags", JSON.stringify(tags));
+      podcastData.append("tags", JSON.stringify(tags.split(",")));
 
       const response = await axios.post("/api/v1/podcast/", podcastData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data", // Ensure correct content type header
         },
       });
 

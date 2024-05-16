@@ -89,77 +89,84 @@ router.post(
     { name: "audio", maxCount: 1 },
   ]),
   async (req, res) => {
-    console.log("Request body:", req.body);
-    console.log("Request files:", req.files);
+    // Changed to async function for better error handling
     try {
-      const { title, content, tags } = req.body;
-      const parsedTags = JSON.parse(tags); 
+      const { title, content } = req.body;
+      const tags = JSON.parse(req.body.tags); // Parse tags to ensure it's an array
 
       const image = req.files["image"]?.[0];
       const audio = req.files["audio"][0];
 
-      const imageFileName = `images/${Date.now()}-${image.originalname}`;
+      const imageFileName = `images/${Date.now() + "-" + image.originalname}`;
       const imageBlob = bucket.file(imageFileName);
       const imageBlobStream = imageBlob.createWriteStream({
         resumable: false,
       });
 
-      const audioFileName = `audios/${Date.now()}-${audio.originalname}`;
+      const audioFileName = `audios/${Date.now() + "-" + audio.originalname}`;
       const audioBlob = bucket.file(audioFileName);
       const audioBlobStream = audioBlob.createWriteStream({
         resumable: false,
       });
 
       imageBlobStream.on("error", (err) => {
-        console.error("Error uploading image:", err);
-        res.status(500).send({ message: "Error uploading image" });
+        res.status(500).send({ message: err.message });
       });
 
       audioBlobStream.on("error", (err) => {
-        console.error("Error uploading audio:", err);
-        res.status(500).send({ message: "Error uploading audio" });
+        res.status(500).send({ message: err.message });
       });
 
-      // Promisify stream events
       const audioStreamFinished = new Promise((resolve, reject) => {
         audioBlobStream.on("finish", resolve);
       });
-
       const imageStreamFinished = new Promise((resolve, reject) => {
         imageBlobStream.on("finish", resolve);
       });
 
-      
-      await Promise.all([audioStreamFinished, imageStreamFinished]);
+      Promise.all([imageStreamFinished, audioStreamFinished]).then(async () => {
+        try {
+          await audioBlob.makePublic();
+          await imageBlob.makePublic();
 
-      
-      await Promise.all([audioBlob.makePublic(), imageBlob.makePublic()]);
-
-     
-      const uploadedPodcast = await db.podcast.create({
-        data: {
-          title,
-          content,
-          tags: parsedTags, 
-          image: imageBlob.publicUrl(),
-          audioUrl: audioBlob.publicUrl(),
-          user: {
-            connect: {
-              id: req.userId,
+          const uploadedPodcast = await db.podcast.create({
+            data: {
+              title,
+              content,
+              tags, // Use parsedTags here
+              image: imageBlob.publicUrl(),
+              audioUrl: audioBlob.publicUrl(),
+              user: {
+                connect: {
+                  id: req.userId,
+                },
+              },
             },
-          },
-        },
+          });
+
+          return res.status(200).send({
+            message: "Podcast uploaded successfully",
+            podcastId: uploadedPodcast.id,
+          });
+        } catch (error) {
+          console.log("Error: ", error);
+          return res.status(500).send({
+            message: `Some error has occurred.`,
+          });
+        }
       });
 
-      return res.status(200).send({
-        message: "Podcast uploaded successfully",
-        podcastId: uploadedPodcast.id,
-      });
+      audioBlobStream.end(audio.buffer);
+      imageBlobStream.end(image.buffer);
     } catch (error) {
-      console.error("Error uploading podcast:", error);
-      return res.status(500).send({ message: "Error uploading podcast" });
+      console.log("Error: ", error);
+      return res.status(500).send({
+        message: `Some error has occurred.`,
+      });
     }
   }
 );
+module.exports = router;
+
 
 module.exports = router;
