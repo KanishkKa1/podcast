@@ -21,6 +21,7 @@ export default function Audio() {
   const { recordedBlob, audioRef, isRecording } = recorderControls;
   const [isAnimating, setIsAnimating] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -49,7 +50,7 @@ export default function Audio() {
 
   const handleUpload = async (event) => {
     event.preventDefault();
-
+    setUploading(true);
     try {
       const { title, content, tags, file, image } = formData;
       if (!title || !content || !tags || (!file && !recordedBlob) || !image) {
@@ -126,9 +127,8 @@ export default function Audio() {
           <div className="audio-wave-container w-10/12">
             <VoiceVisualizer
               ref={audioRef}
-              canvasContainerClassName={`audio-wave ${
-                isAnimating ? "animate" : ""
-              }`}
+              canvasContainerClassName={`audio-wave ${isAnimating ? "animate" : ""
+                }`}
               controls={recorderControls}
               mainBarColor="black"
               secondaryBarColor="black"
@@ -144,7 +144,7 @@ export default function Audio() {
           </button>
           {showModal && (
             <div className="fixed inset-0 z-10 overflow-y-auto bg-gray-800 bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-8 max-w-md w-full rounded-lg shadow-lg relative">
+              <div className="bg-white px-8 py-4 max-w-md w-full rounded-lg shadow-lg relative">
                 <button
                   onClick={toggleModal}
                   className="absolute top-2 right-2 text-gray-500"
@@ -160,7 +160,7 @@ export default function Audio() {
                   encType="multipart/form-data"
                 >
                   <div className="text-left">
-                    <p className="bg-yellow-100 p-2">
+                    <p className="bg-yellow-100 text-sm px-2">
                       If not recorded, upload your own file here 👇
                     </p>
                   </div>
@@ -194,6 +194,11 @@ export default function Audio() {
                     onChange={handleChange}
                     className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
+                  <div className="text-left">
+                    <p className="bg-yellow-100 text-sm px-2">
+                      Add the thumbnail for your podcast 👇
+                    </p>
+                  </div>
                   <input
                     type="file"
                     accept="image/*"
@@ -203,8 +208,9 @@ export default function Audio() {
                   <button
                     type="submit"
                     className="bg-black text-white rounded-full py-2 px-4"
+                    disabled={uploading}
                   >
-                    Submit
+                    {uploading ? "Uploading..." : "Submit"}
                   </button>
                 </form>
               </div>
