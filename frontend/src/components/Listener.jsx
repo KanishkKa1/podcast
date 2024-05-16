@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Card from "./Card";
 import { FaTimes, FaHeart } from "react-icons/fa";
@@ -6,6 +6,7 @@ import { BiLogIn, BiSolidUpvote } from "react-icons/bi";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { UserContext } from "../../context/userContext";
 
 const Listener = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -13,53 +14,29 @@ const Listener = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [upvoted, setUpvoted] = useState(false);
-  const [upvoteCount, setUpvoteCount] = useState(0);
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPodcasts = async () => {
-      try {
-        const token = Cookies.get("token");
-
-        const response = await axios.get("/api/v1/podcast", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setPodcasts(response.data.podcasts);
-      } catch (error) {
-        console.error("Error fetching podcasts: ", error);
-      }
-    };
-
-    fetchPodcasts();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserPodcasts = async () => {
-      try {
-        const token = Cookies.get("token");
-
-        const response = await axios.get("/api/v1/podcast/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setPodcasts(response.data.podcasts);
-      } catch (error) {
-        console.error("Error fetching current user's podcasts: ", error);
-      }
-    };
-
-    fetchUserPodcasts();
-  }, []);
-
-  useEffect(() => {
-    if (selectedPodcast) {
-      fetchTopComments();
-      const interval = setInterval(fetchTopComments, 5000);
-      return () => clearInterval(interval);
+    if (!user) {
+      navigate("/login");
+    } else {
+      const fetchPodcasts = async () => {
+        try {
+          const token = Cookies.get("token");
+          const response = await axios.get("/api/v1/podcast", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setPodcasts(response.data.podcasts);
+        } catch (error) {
+          console.error("Error fetching podcasts: ", error);
+        }
+      };
+      fetchPodcasts();
     }
-  }, [selectedPodcast]);
+  }, [user, navigate]);
 
   const openModal = async (podcastId) => {
     const token = Cookies.get("token");
@@ -72,6 +49,7 @@ const Listener = () => {
       })
       .then((response) => {
         setSelectedPodcast(response.data);
+        fetchTopComments(podcastId); // Fetch top comments when a podcast is opened
       })
       .catch((error) => {
         console.error("Error fetching podcast details: ", error);
@@ -90,22 +68,14 @@ const Listener = () => {
 
   const addComment = () => {
     const token = Cookies.get("token");
-
     if (newComment.trim() === "") {
       return;
     }
-
     axios
       .post(
         `/api/v1/comment/${selectedPodcast.id}`,
-        {
-          comment: newComment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { comment: newComment },
+        { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
         setComments([response.data.comment, ...comments]);
@@ -117,11 +87,10 @@ const Listener = () => {
       });
   };
 
-  const fetchTopComments = () => {
+  const fetchTopComments = (podcastId) => {
     const token = Cookies.get("token");
-
     axios
-      .get(`/api/v1/comment/${selectedPodcast.id}/3`, {
+      .get(`/api/v1/comment/${podcastId}/3`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -137,7 +106,7 @@ const Listener = () => {
 
   return (
     <div className="bg-slate-200 p-1">
-      <h1 className="text-2xl  text-center m-3">Podcasts</h1>
+      <h1 className="text-2xl text-center m-3">Podcasts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center bg-slate-200">
         {podcasts.map((podcast) => (
           <Card

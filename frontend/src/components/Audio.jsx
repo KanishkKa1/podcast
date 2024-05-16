@@ -1,13 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { UserContext } from "../../context/userContext";
 import { FaTimes } from "react-icons/fa";
 
 export default function Audio() {
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
   const recorderControls = useVoiceVisualizer();
   const { recordedBlob, audioRef, isRecording } = recorderControls;
   const [isAnimating, setIsAnimating] = useState(false);
@@ -83,7 +92,6 @@ export default function Audio() {
         navigate("/listener");
       }
 
-      console.log(response.data);
       toggleModal();
     } catch (error) {
       console.error("Error uploading audio: ", error);
@@ -130,7 +138,7 @@ export default function Audio() {
         <div className="absolute bottom-0 left-0 right-0 text-center pb-8">
           <button
             onClick={toggleModal}
-            className="bg-black text-white rounded-full py-2 px-4"
+            className="bg-black text-white rounded-full py-2 px-4 mb-4"
           >
             Upload Your File
           </button>
