@@ -138,7 +138,7 @@ export default function Audio() {
         <div className="absolute bottom-0 left-0 right-0 text-center pb-8">
           <button
             onClick={toggleModal}
-            className="bg-black text-white rounded-full py-2 px-4 mb-4"
+            className="bg-black text-white rounded-full py-2 px-4 mb-14"
           >
             Upload Your File
           </button>
