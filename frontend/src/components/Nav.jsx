@@ -16,7 +16,7 @@ const Nav = () => {
   };
 
   return (
-    <div className="shadow-xl p-0 w-full fixed top-0 left-0 bg-white z-50">
+    <div className="shadow-sm p-0 w-full fixed top-0 left-0 bg-white z-50">
       <div className="flex justify-between mx-10 items-center p-2">
         <div>
           <h1 className="text-3xl font-extrabold text-yellow-400">
