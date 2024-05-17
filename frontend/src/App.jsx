@@ -10,23 +10,23 @@ import { UserContextProvider } from "../context/userContext";
 import { Toaster } from "react-hot-toast";
 import axios from "axios";
 
-axios.defaults.baseURL = "https://just-surge-423118-c2.el.r.appspot.com/";
+axios.defaults.baseURL = "http://34.93.156.106/";
 axios.defaults.withCredentials = true;
 
 function App() {
-  return (
-    <UserContextProvider>
-      <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
-      <Routes>
-        <Route path="/" element={<Hero />} />
-        <Route path="/listener" element={<Listener />} />
-        <Route path="/speaker" element={<Speaker />} />
-        <Route path="/pick" element={<Pick />} />
-        <Route path="/login" element={<Signin />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-    </UserContextProvider>
-  );
+    return (
+        <UserContextProvider>
+            <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
+            <Routes>
+                <Route path="/" element={<Hero />} />
+                <Route path="/listener" element={<Listener />} />
+                <Route path="/speaker" element={<Speaker />} />
+                <Route path="/pick" element={<Pick />} />
+                <Route path="/login" element={<Signin />} />
+                <Route path="/signup" element={<Signup />} />
+            </Routes>
+        </UserContextProvider>
+    );
 }
 
 export default App;
