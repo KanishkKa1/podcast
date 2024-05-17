@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
 import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Signin = () => {
   const { setUser } = useContext(UserContext);
@@ -28,15 +29,12 @@ const Signin = () => {
       const { data: userData } = await axios.post("/api/v1/user/signin", data);
       if (userData.error) {
         toast.error(userData.error);
-
         setUser(null);
-        document.cookie = "token=;path=/;max-age=-1";
+        Cookies.remove("token");
       } else {
         setUser(userData);
         toast.success("Login Successful. Welcome!");
-
-        document.cookie = `token=${userData.token};path=/;max-age=3600`;
-
+        Cookies.set("token", userData.token, { expires: 1, secure: true }); 
         setData({ emailOrUsername: "", password: "" });
         navigate("/");
       }
@@ -62,7 +60,7 @@ const Signin = () => {
             type="text"
             name="emailOrUsername"
             placeholder="Username or email"
-            value={data.email}
+            value={data.emailOrUsername}
             onChange={handleChange}
             className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
