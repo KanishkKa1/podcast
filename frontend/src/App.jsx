@@ -1,16 +1,16 @@
-import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Pick from './components/Pick';
-import Listener from './components/Listener';
-import Speaker from './components/Speaker';
-import Hero from './components/Hero';
-import Signin from './components/Signin';
-import Signup from './components/signup';
+import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Pick from "./components/Pick";
+import Listener from "./components/Listener";
+import Speaker from "./components/Speaker";
+import Hero from "./components/Hero";
+import Signin from "./components/Signin";
+import Signup from "./components/signup";
 import { UserContextProvider } from "../context/userContext";
 import { Toaster } from "react-hot-toast";
-import axios from 'axios';
+import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8000/";
+axios.defaults.baseURL = "https://just-surge-423118-c2.el.r.appspot.com/";
 axios.defaults.withCredentials = true;
 
 function App() {

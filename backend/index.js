@@ -15,6 +15,14 @@ app.use(
   })
 );
 
+app.get("/ping", (req, res) => {
+  res.status(201).send(`<h1>Pong</h1> <p>${process.env.TEST}</p>`);
+});
+
+app.get("/", (req, res) => {
+  res.send("GCP App Engine!");
+});
+
 //routes
 app.use("/api/v1", require("./routes/index"));
 
