@@ -8,14 +8,7 @@ import { UserContext } from "../../context/userContext";
 import { FaTimes } from "react-icons/fa";
 
 export default function Audio() {
-  const { user } = useContext(UserContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   const recorderControls = useVoiceVisualizer();
   const { recordedBlob, audioRef, isRecording } = recorderControls;
@@ -127,8 +120,9 @@ export default function Audio() {
           <div className="audio-wave-container w-10/12">
             <VoiceVisualizer
               ref={audioRef}
-              canvasContainerClassName={`audio-wave ${isAnimating ? "animate" : ""
-                }`}
+              canvasContainerClassName={`audio-wave ${
+                isAnimating ? "animate" : ""
+              }`}
               controls={recorderControls}
               mainBarColor="black"
               secondaryBarColor="black"

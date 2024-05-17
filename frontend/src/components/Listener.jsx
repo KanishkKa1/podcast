@@ -15,29 +15,24 @@ const Listener = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [upvoted, setUpvoted] = useState(false);
-  const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    } else {
-      const fetchPodcasts = async () => {
-        try {
-          const token = Cookies.get("token");
-          const response = await axios.get("/api/v1/podcast", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setPodcasts(response.data.podcasts);
-        } catch (error) {
-          console.error("Error fetching podcasts: ", error);
-        }
-      };
-      fetchPodcasts();
-    }
-  }, [user, navigate]);
+    const fetchPodcasts = async () => {
+      try {
+        const token = Cookies.get("token");
+        const response = await axios.get("/api/v1/podcast", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPodcasts(response.data.podcasts);
+      } catch (error) {
+        console.error("Error fetching podcasts: ", error);
+      }
+    };
+    fetchPodcasts();
+  }, [navigate]);
 
   const openModal = async (podcastId) => {
     const token = Cookies.get("token");
@@ -109,7 +104,7 @@ const Listener = () => {
     <div className="bg-slate-200 p-1">
       <div className="flex justify-between items-center mx-5 mt-16">
         <h1 className="text-2xl font-bold text-center m-3 ">Podcasts</h1>
-        <Link to='/speaker'>
+        <Link to="/speaker">
           <button className="text-lg font-bold mx-5 p-2 rounded-md transition duration-300 ease-in-out bg-black text-white hover:bg-yellow-400">
             Create your own podcast
           </button>
@@ -144,8 +139,9 @@ const Listener = () => {
                   <p className="font-bold">{comment.user.username}</p>
                   <p>{comment.content}</p>
                   <button
-                    className={`text-xl hover:text-2xl ${upvoted ? "text-red-500" : "text-gray-500"
-                      }`}
+                    className={`text-xl hover:text-2xl ${
+                      upvoted ? "text-red-500" : "text-gray-500"
+                    }`}
                   >
                     <BiSolidUpvote />
                   </button>
